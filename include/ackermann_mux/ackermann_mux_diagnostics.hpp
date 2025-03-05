@@ -32,51 +32,48 @@
  * @author Brighten Lee
  */
 
-#ifndef TWIST_MUX__TWIST_MUX_DIAGNOSTICS_STATUS_HPP_
-#define TWIST_MUX__TWIST_MUX_DIAGNOSTICS_STATUS_HPP_
+#ifndef ACKERMANN_MUX__ACKERMANN_MUX_DIAGNOSTICS_HPP_
+#define ACKERMANN_MUX__ACKERMANN_MUX_DIAGNOSTICS_HPP_
 
-#include <twist_mux/twist_mux.hpp>
-#include <twist_mux/topic_handle.hpp>
+#include <ackermann_mux/ackermann_mux_diagnostics_status.hpp>
 
-#include <rclcpp/rclcpp.hpp>
+#include <diagnostic_updater/diagnostic_updater.hpp>
 
 #include <memory>
 
-namespace twist_mux
+namespace ackermann_mux
 {
-struct TwistMuxDiagnosticsStatus
+class AckermannMuxDiagnostics
 {
-  typedef std::shared_ptr<TwistMuxDiagnosticsStatus> Ptr;
-  typedef std::shared_ptr<const TwistMuxDiagnosticsStatus> ConstPtr;
+public:
+  typedef AckermannMuxDiagnosticsStatus status_type;
 
-  double reading_age;
-  rclcpp::Time last_loop_update;
-  double main_loop_time;
+  static constexpr double MAIN_LOOP_TIME_MIN = 0.2;   // [s]
+  static constexpr double READING_AGE_MIN = 3.0;     // [s]
 
-  LockTopicHandle::priority_type priority;
+  explicit AckermannMuxDiagnostics(AckermannMux * mux);
+  virtual ~AckermannMuxDiagnostics() = default;
 
-  bool use_stamped;
+  void diagnostics(diagnostic_updater::DiagnosticStatusWrapper & stat);
 
-  std::shared_ptr<TwistMux::velocity_topic_container> velocity_hs;
-  std::shared_ptr<TwistMux::velocity_stamped_topic_container> velocity_stamped_hs;
-  std::shared_ptr<TwistMux::lock_topic_container> lock_hs;
+  void update();
 
-  TwistMuxDiagnosticsStatus()
-  : reading_age(0),
-    last_loop_update(rclcpp::Clock().now()),
-    main_loop_time(0),
-    priority(0),
-    use_stamped(true)
+  void updateStatus(const status_type::ConstPtr & status);
+
+private:
+  /**
+   * @brief Levels
+   */
+  enum
   {
-    velocity_hs = std::make_shared<TwistMux::velocity_topic_container>();
-    velocity_stamped_hs = std::make_shared<TwistMux::velocity_stamped_topic_container>();
-    lock_hs = std::make_shared<TwistMux::lock_topic_container>();
-  }
+    OK = diagnostic_msgs::msg::DiagnosticStatus::OK,
+    WARN = diagnostic_msgs::msg::DiagnosticStatus::WARN,
+    ERROR = diagnostic_msgs::msg::DiagnosticStatus::ERROR
+  };
+
+  std::shared_ptr<diagnostic_updater::Updater> diagnostic_;
+  std::shared_ptr<status_type> status_;
 };
+}  // namespace ackermann_mux
 
-typedef TwistMuxDiagnosticsStatus::Ptr TwistMuxDiagnosticsStatusPtr;
-typedef TwistMuxDiagnosticsStatus::ConstPtr TwistMuxDiagnosticsStatusConstPtr;
-
-}  // namespace twist_mux
-
-#endif  // TWIST_MUX__TWIST_MUX_DIAGNOSTICS_STATUS_HPP_
+#endif  // ACKERMANN_MUX__ACKERMANN_MUX_DIAGNOSTICS_HPP_

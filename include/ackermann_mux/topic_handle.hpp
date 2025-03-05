@@ -33,22 +33,22 @@
  * @author Brighten Lee
  */
 
-#ifndef TWIST_MUX__TOPIC_HANDLE_HPP_
-#define TWIST_MUX__TOPIC_HANDLE_HPP_
+#ifndef ACKERMANN_MUX__TOPIC_HANDLE_HPP_
+#define ACKERMANN_MUX__TOPIC_HANDLE_HPP_
 
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/bool.hpp>
-#include <geometry_msgs/msg/twist.hpp>
-#include <geometry_msgs/msg/twist_stamped.hpp>
+#include <ackermann_msgs/msg/ackermann_drive.hpp>
+#include <ackermann_msgs/msg/ackermann_drive_stamped.hpp>
 
-#include <twist_mux/utils.hpp>
-#include <twist_mux/twist_mux.hpp>
+#include <ackermann_mux/utils.hpp>
+#include <ackermann_mux/ackermann_mux.hpp>
 
 #include <memory>
 #include <string>
 #include <vector>
 
-namespace twist_mux
+namespace ackermann_mux
 {
 template<typename T>
 class TopicHandle_
@@ -76,7 +76,7 @@ public:
    */
   TopicHandle_(
     const std::string & name, const std::string & topic, const rclcpp::Duration & timeout,
-    priority_type priority, TwistMux * mux)
+    priority_type priority, AckermannMux * mux)
   : name_(name),
     topic_(topic),
     timeout_(timeout),
@@ -148,26 +148,26 @@ protected:
   priority_type priority_;
 
 protected:
-  TwistMux * mux_;
+  AckermannMux * mux_;
 
   rclcpp::Time stamp_;
   T msg_;
 };
 
-class VelocityTopicHandle : public TopicHandle_<geometry_msgs::msg::Twist>
+class VelocityTopicHandle : public TopicHandle_<ackermann_msgs::msg::AckermannDrive>
 {
 private:
-  typedef TopicHandle_<geometry_msgs::msg::Twist> base_type;
+  typedef TopicHandle_<ackermann_msgs::msg::AckermannDrive> base_type;
 
 public:
   typedef typename base_type::priority_type priority_type;
 
   VelocityTopicHandle(
     const std::string & name, const std::string & topic, const rclcpp::Duration & timeout,
-    priority_type priority, TwistMux * mux)
+    priority_type priority, AckermannMux * mux)
   : base_type(name, topic, timeout, priority, mux)
   {
-    subscriber_ = mux_->create_subscription<geometry_msgs::msg::Twist>(
+    subscriber_ = mux_->create_subscription<ackermann_msgs::msg::AckermannDrive>(
       topic_, rclcpp::SystemDefaultsQoS(),
       std::bind(&VelocityTopicHandle::callback, this, std::placeholders::_1));
   }
@@ -178,35 +178,35 @@ public:
     return hasExpired() || (getPriority() < lock_priority);
   }
 
-  void callback(const geometry_msgs::msg::Twist::ConstSharedPtr msg)
+  void callback(const ackermann_msgs::msg::AckermannDrive::ConstSharedPtr msg)
   {
     stamp_ = mux_->now();
     msg_ = *msg;
 
-    // Check if this twist has priority.
+    // Check if this drive has priority.
     // Note that we have to check all the locks because they might time out
     // and since we have several topics we must look for the highest one in
     // all the topic list; so far there's no O(1) solution.
     if (mux_->hasPriority(*this)) {
-      mux_->publishTwist(msg);
+      mux_->publishDrive(msg);
     }
   }
 };
 
-class VelocityStampedTopicHandle : public TopicHandle_<geometry_msgs::msg::TwistStamped>
+class VelocityStampedTopicHandle : public TopicHandle_<ackermann_msgs::msg::AckermannDriveStamped>
 {
 private:
-  typedef TopicHandle_<geometry_msgs::msg::TwistStamped> base_type;
+  typedef TopicHandle_<ackermann_msgs::msg::AckermannDriveStamped> base_type;
 
 public:
   typedef typename base_type::priority_type priority_type;
 
   VelocityStampedTopicHandle(
     const std::string & name, const std::string & topic, const rclcpp::Duration & timeout,
-    priority_type priority, TwistMux * mux)
+    priority_type priority, AckermannMux * mux)
   : base_type(name, topic, timeout, priority, mux)
   {
-    subscriber_ = mux_->create_subscription<geometry_msgs::msg::TwistStamped>(
+    subscriber_ = mux_->create_subscription<ackermann_msgs::msg::AckermannDriveStamped>(
       topic_, rclcpp::SystemDefaultsQoS(),
       std::bind(&VelocityStampedTopicHandle::callback, this, std::placeholders::_1));
   }
@@ -216,17 +216,17 @@ public:
     return hasExpired() || (getPriority() < lock_priority);
   }
 
-  void callback(const geometry_msgs::msg::TwistStamped::ConstSharedPtr msg)
+  void callback(const ackermann_msgs::msg::AckermannDriveStamped::ConstSharedPtr msg)
   {
     stamp_ = mux_->now();
     msg_ = *msg;
 
-    // Check if this twist has priority.
+    // Check if this drive has priority.
     // Note that we have to check all the locks because they might time out
     // and since we have several topics we must look for the highest one in
     // all the topic list; so far there's no O(1) solution.
     if (mux_->hasPriorityStamped(*this)) {
-      mux_->publishTwistStamped(msg);
+      mux_->publishDriveStamped(msg);
     }
   }
 };
@@ -241,7 +241,7 @@ public:
 
   LockTopicHandle(
     const std::string & name, const std::string & topic, const rclcpp::Duration & timeout,
-    priority_type priority, TwistMux * mux)
+    priority_type priority, AckermannMux * mux)
   : base_type(name, topic, timeout, priority, mux)
   {
     subscriber_ = mux_->create_subscription<std_msgs::msg::Bool>(
@@ -265,6 +265,6 @@ public:
   }
 };
 
-}  // namespace twist_mux
+}  // namespace ackermann_mux
 
-#endif  // TWIST_MUX__TOPIC_HANDLE_HPP_
+#endif  // ACKERMANN_MUX__TOPIC_HANDLE_HPP_

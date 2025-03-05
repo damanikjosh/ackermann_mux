@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>twist_mux</name>
+  <name>ackermann_mux</name>
   <version>4.4.0</version>
   <description>
       Twist multiplexer, which multiplex several velocity commands (topics) and
@@ -24,7 +24,7 @@
   <depend>visualization_msgs</depend>
   <depend>diagnostic_updater</depend>
 
-  <exec_depend>twist_mux_msgs</exec_depend>
+  <exec_depend>ackermann_mux_msgs</exec_depend>
 
   <test_depend>ament_lint_auto</test_depend>
 

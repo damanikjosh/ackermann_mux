@@ -33,18 +33,18 @@
  */
 
 #include <rclcpp/rclcpp.hpp>
-#include <geometry_msgs/msg/twist.hpp>
-#include <geometry_msgs/msg/twist_stamped.hpp>
+#include <ackermann_msgs/msg/ackermann_drive.hpp>
+#include <ackermann_msgs/msg/ackermann_drive_stamped.hpp>
 #include <visualization_msgs/msg/marker.hpp>
 #include <visualization_msgs/msg/marker_array.hpp>
 
 #include <memory>
 #include <string>
 
-class TwistMarker
+class AckermannMarker
 {
 public:
-  TwistMarker(std::string & frame_id, double scale, double z)
+  AckermannMarker(std::string & frame_id, double scale, double z)
   : frame_id_(frame_id), scale_(scale), z_(z)
   {
     // ID and type:
@@ -54,7 +54,7 @@ public:
     // Frame ID:
     marker_.header.frame_id = frame_id_;
 
-    // Pre-allocate points for setting the arrow with the twist:
+    // Pre-allocate points for setting the arrow with the drive:
     marker_.points.resize(2);
 
     // Vertical position:
@@ -74,17 +74,12 @@ public:
     marker_.points[1].z = 0.01;
   }
 
-  void update(const geometry_msgs::msg::Twist & twist)
+  void update(const ackermann_msgs::msg::AckermannDrive & drive)
   {
     using std::abs;
 
-    marker_.points[1].x = twist.linear.x;
-
-    if (abs(twist.linear.y) > abs(twist.angular.z)) {
-      marker_.points[1].y = twist.linear.y;
-    } else {
-      marker_.points[1].y = twist.angular.z;
-    }
+    marker_.points[1].x = drive.speed;
+    marker_.points[1].y = drive.steering_angle;
   }
 
   const visualization_msgs::msg::Marker & getMarker()
@@ -100,11 +95,11 @@ private:
   double z_;
 };
 
-class TwistMarkerPublisher : public rclcpp::Node
+class AckermannMarkerPublisher : public rclcpp::Node
 {
 public:
-  TwistMarkerPublisher()
-  : Node("twist_marker")
+  AckermannMarkerPublisher()
+  : Node("ackermann_marker")
   {
     std::string frame_id;
     double scale;
@@ -121,19 +116,19 @@ public:
     this->get_parameter<bool>("use_stamped", use_stamped);
     this->get_parameter<double>("vertical_position", z);
 
-    marker_ = std::make_shared<TwistMarker>(frame_id, scale, z);
+    marker_ = std::make_shared<AckermannMarker>(frame_id, scale, z);
 
     if (use_stamped)
     {
-      sub_stamped_ = this->create_subscription<geometry_msgs::msg::TwistStamped>(
-        "twist", rclcpp::SystemDefaultsQoS(),
-        std::bind(&TwistMarkerPublisher::callback_stamped, this, std::placeholders::_1));
+      sub_stamped_ = this->create_subscription<ackermann_msgs::msg::AckermannDriveStamped>(
+        "drive", rclcpp::SystemDefaultsQoS(),
+        std::bind(&AckermannMarkerPublisher::callback_stamped, this, std::placeholders::_1));
     }
     else
     {
-      sub_ = this->create_subscription<geometry_msgs::msg::Twist>(
-        "twist", rclcpp::SystemDefaultsQoS(),
-        std::bind(&TwistMarkerPublisher::callback, this, std::placeholders::_1));
+      sub_ = this->create_subscription<ackermann_msgs::msg::AckermannDrive>(
+        "drive", rclcpp::SystemDefaultsQoS(),
+        std::bind(&AckermannMarkerPublisher::callback, this, std::placeholders::_1));
     }
 
     pub_ =
@@ -142,35 +137,35 @@ public:
       rclcpp::QoS(rclcpp::KeepLast(1)));
   }
 
-  void callback(const geometry_msgs::msg::Twist::ConstSharedPtr twist)
+  void callback(const ackermann_msgs::msg::AckermannDrive::ConstSharedPtr drive)
   {
-    marker_->update(*twist);
+    marker_->update(*drive);
 
     pub_->publish(marker_->getMarker());
   }
 
-  void callback_stamped(const geometry_msgs::msg::TwistStamped::ConstSharedPtr twist)
+  void callback_stamped(const ackermann_msgs::msg::AckermannDriveStamped::ConstSharedPtr drive)
   {
-    marker_->update(twist->twist);
+    marker_->update(drive->drive);
 
     pub_->publish(marker_->getMarker());
   }
 
 private:
-  rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr sub_;
-  rclcpp::Subscription<geometry_msgs::msg::TwistStamped>::SharedPtr sub_stamped_;
+  rclcpp::Subscription<ackermann_msgs::msg::AckermannDrive>::SharedPtr sub_;
+  rclcpp::Subscription<ackermann_msgs::msg::AckermannDriveStamped>::SharedPtr sub_stamped_;
   rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr pub_;
 
-  std::shared_ptr<TwistMarker> marker_ = nullptr;
+  std::shared_ptr<AckermannMarker> marker_ = nullptr;
 };
 
 int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
 
-  auto twist_mux_node = std::make_shared<TwistMarkerPublisher>();
+  auto ackermann_mux_node = std::make_shared<AckermannMarkerPublisher>();
 
-  rclcpp::spin(twist_mux_node);
+  rclcpp::spin(ackermann_mux_node);
 
   rclcpp::shutdown();
 

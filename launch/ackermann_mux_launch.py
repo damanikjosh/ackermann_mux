@@ -24,11 +24,11 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    default_config_locks = os.path.join(get_package_share_directory('twist_mux'),
-                                        'config', 'twist_mux_locks.yaml')
-    default_config_topics = os.path.join(get_package_share_directory('twist_mux'),
-                                         'config', 'twist_mux_topics.yaml')
-    default_config_joystick = os.path.join(get_package_share_directory('twist_mux'),
+    default_config_locks = os.path.join(get_package_share_directory('ackermann_mux'),
+                                        'config', 'ackermann_mux_locks.yaml')
+    default_config_topics = os.path.join(get_package_share_directory('ackermann_mux'),
+                                         'config', 'ackermann_mux_topics.yaml')
+    default_config_joystick = os.path.join(get_package_share_directory('ackermann_mux'),
                                            'config', 'joystick.yaml')
 
     return LaunchDescription([
@@ -45,38 +45,38 @@ def generate_launch_description():
             default_value=default_config_joystick,
             description='Default joystick config file'),
         DeclareLaunchArgument(
-            'cmd_vel_out',
-            default_value='twist_mux/cmd_vel',
+            'drive_out',
+            default_value='ackermann_mux/drive',
             description='cmd vel output topic'),
         DeclareLaunchArgument(
             'use_sim_time',
             default_value='False',
             description='Use simulation time'),
         Node(
-            package='twist_mux',
-            executable='twist_mux',
+            package='ackermann_mux',
+            executable='ackermann_mux',
             output='screen',
-            remappings={('/cmd_vel_out', LaunchConfiguration('cmd_vel_out'))},
+            remappings={('/drive_out', LaunchConfiguration('drive_out'))},
             parameters=[
                 {'use_sim_time': LaunchConfiguration('use_sim_time')},
                 LaunchConfiguration('config_locks'),
                 LaunchConfiguration('config_topics')]
         ),
         Node(
-            package='twist_mux',
-            executable='twist_marker',
+            package='ackermann_mux',
+            executable='ackermann_marker',
             output='screen',
-            remappings={('/twist', LaunchConfiguration('cmd_vel_out'))},
+            remappings={('/drive', LaunchConfiguration('drive_out'))},
             parameters=[{
                 'use_sim_time': LaunchConfiguration('use_sim_time'),
                 'frame_id': 'base_link',
                 'scale': 1.0,
                 'vertical_position': 2.0}]),
         Node(
-            package='twist_mux',
+            package='ackermann_mux',
             executable='joystick_relay.py',
             output='screen',
-            remappings={('joy_vel_in', 'input_joy/cmd_vel'),
+            remappings={('joy_vel_in', 'input_joy/drive'),
                         ('joy_vel_out', 'joy_vel')},
             parameters=[
                 {'use_sim_time': LaunchConfiguration('use_sim_time')},

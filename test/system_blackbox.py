@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# twist_mux: system_blackbox.py
+# ackermann_mux: system_blackbox.py
 #
 # Copyright (c) 2020 PAL Robotics S.L. All rights reserved.
 #
@@ -35,8 +35,8 @@ from rate_publishers import RatePublishers, TimeoutManager
 def twist(x=0.0, r=0.0):
     """Return a Twist for the given linear and rotation speed."""
     t = Twist()
-    t.linear.x = x
-    t.angular.z = r
+    t.speed = x
+    t.steering_angle = r
     return t
 
 
@@ -76,7 +76,7 @@ class TestTwistMux(unittest.TestCase):
         self._lock2.pub(unlock)
 
         # Wait for previously published messages to time out,
-        # since we aren't restarting twist_mux.
+        # since we aren't restarting ackermann_mux.
         #
         # This sleeping time must be higher than any of the
         # timeouts in system_test_config.yaml.
@@ -90,13 +90,13 @@ class TestTwistMux(unittest.TestCase):
         time.sleep(cls.MESSAGE_TIMEOUT)
         # TODO wait_for_msg-like functionnality not yet available
         # https://github.com/ros2/rclcpp/issues/520
-        return rospy.wait_for_message('cmd_vel_out', Twist,
+        return rospy.wait_for_message('drive_out', Twist,
                                       timeout=cls.MESSAGE_TIMEOUT)
 
     def test_empty(self):
         try:
             self._vel_cmd()
-            self.fail('twist_mux should not be publishing without any input')
+            self.fail('ackermann_mux should not be publishing without any input')
         except rospy.ROSException:
             pass
 
@@ -129,7 +129,7 @@ class TestTwistMux(unittest.TestCase):
 
 if __name__ == '__main__':
     import rostest
-    PKG_NAME = 'twist_mux'
+    PKG_NAME = 'ackermann_mux'
     TEST_NAME = '%s_system_blackbox_test' % PKG_NAME
     rospy.init_node(TEST_NAME)
     rostest.rosrun(PKG_NAME, TEST_NAME, TestTwistMux)

@@ -1,34 +1,34 @@
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Changelog for package twist_mux
+Changelog for package ackermann_mux
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 4.4.0 (2024-10-01)
 ------------------
-* TwistStamped Support (`#50 <https://github.com/ros-teleop/twist_mux/issues/50>`_)
+* TwistStamped Support (`#50 <https://github.com/ros-teleop/ackermann_mux/issues/50>`_)
 * Contributors: luis-camero
 
 4.3.0 (2023-11-11)
 ------------------
-* Add use_sim_time param for joystick_relay (`#48 <https://github.com/ros-teleop/twist_mux/issues/48>`_)
-* Add use_sim_time param to launchfile (`#41 <https://github.com/ros-teleop/twist_mux/issues/41>`_)
+* Add use_sim_time param for joystick_relay (`#48 <https://github.com/ros-teleop/ackermann_mux/issues/48>`_)
+* Add use_sim_time param to launchfile (`#41 <https://github.com/ros-teleop/ackermann_mux/issues/41>`_)
 * Contributors: Noel Jiménez García, Steven Palma
 
 4.2.0 (2023-09-18)
 ------------------
-* Joystick relay for ROS 2 (`#43 <https://github.com/ros-teleop/twist_mux/issues/43>`_)
-* Add CI (`#47 <https://github.com/ros-teleop/twist_mux/issues/47>`_)
-* Clean up parameter warnings for Rolling (`#28 <https://github.com/ros-teleop/twist_mux/issues/28>`_)
+* Joystick relay for ROS 2 (`#43 <https://github.com/ros-teleop/ackermann_mux/issues/43>`_)
+* Add CI (`#47 <https://github.com/ros-teleop/ackermann_mux/issues/47>`_)
+* Clean up parameter warnings for Rolling (`#28 <https://github.com/ros-teleop/ackermann_mux/issues/28>`_)
 * Contributors: Bence Magyar, Noel Jiménez García, Stephen Street
 
 4.1.0 (2021-11-26)
 ------------------
-* Cleanup parameter warnings & cpplint (`#32 <https://github.com/ros-teleop/twist_mux/issues/32>`_)
+* Cleanup parameter warnings & cpplint (`#32 <https://github.com/ros-teleop/ackermann_mux/issues/32>`_)
 * Update maintainer and license tag
 * Contributors: Stephen Street, Bence Magyar
 
 4.0.0 (2021-06-16)
 ------------------
-* Foxy migration (`#25 <https://github.com/ros-teleop/twist_mux/issues/25>`_)
+* Foxy migration (`#25 <https://github.com/ros-teleop/ackermann_mux/issues/25>`_)
 * Contributors: Victor Lopez
 
 3.1.0 (2018-06-25)
@@ -36,7 +36,7 @@ Changelog for package twist_mux
 
 3.0.0 (2016-07-12)
 ------------------
-* Merge pull request `#8 <https://github.com/ros-teleop/twist_mux/issues/8>`_ from ros-teleop/update_jade_from_indigo_devel
+* Merge pull request `#8 <https://github.com/ros-teleop/ackermann_mux/issues/8>`_ from ros-teleop/update_jade_from_indigo_devel
   fix queue_size SyntaxWarning
 * fix queue_size SyntaxWarning
 * Update README.md
